@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang='en-US'>
+<head>
+<meta charset="utf-8">
+<title>Matrix Transforms</title>
+</head>
+<body>
+<canvas id="canvas" width="800" height="600"></canvas>
+<script>
+(function () {
+    "use strict";
+
+    function Rect(width, height, color) {
+        this.width = width;
+        this.height = height;
+        this.color = color;
+
+        // midpoint of rect - use relative coordinates because of translate
+        this.x = -this.width / 2;
+        this.y = -this.height / 2;
+        
+        this.degrees = 0;
+
+        this.update = function () {
+            this.degrees = (this.degrees + 1) % 360;
+        };
+
+        this.render = function () {
+            context.save();
+
+            // use matrix transform instead of separate translate and rotate functions
+            let cos = Math.cos(this.degrees * Math.PI / 180);
+            let sin = Math.sin(this.degrees * Math.PI / 180);
+            context.transform(cos, sin, -sin, cos, canvas.width / 2, canvas.height / 2);
+
+            context.beginPath();
+            context.strokeStyle = this.color;
+            context.strokeRect(this.x, this.y, this.width, this.height);
+
+            context.restore();
+        };
+    }
+
+    function rotate() {
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        rect.render();
+        rect.update();
+        window.requestAnimationFrame(rotate);
+    }
+
+    let canvas = document.getElementById("canvas");
+    let context = canvas.getContext("2d");
+    let rect = new Rect(400, 100, "#000");  // args are width, height, color
+    rotate();
+}());</script>
+</body>
+</html>
